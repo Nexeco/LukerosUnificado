@@ -718,3 +718,87 @@ export async function deleteUser(id) {
   if (!rowCount) throw Object.assign(new Error('not found'), { status: 404 });
   return { ok: true };
 }
+
+// Download functions: return ALL records with complete information
+export async function downloadAllClientes() {
+  if (!usePg) {
+    const db = readFileDB();
+    const map = new Map();
+    for (const s of db.solicitudes) {
+      const prev = map.get(s.phone);
+      if (!prev || new Date(s.created_at) > new Date(prev.created_at)) {
+        map.set(s.phone, { id: s.id, phone: s.phone, created_at: s.created_at });
+      }
+    }
+    return Array.from(map.values());
+  }
+  const { rows } = await pool.query('select id, phone, created_at from clientes order by id desc');
+  return rows;
+}
+
+export async function downloadAllFormularios() {
+  if (!usePg) {
+    const db = readFileDB();
+    const arr = [];
+    for (const s of db.solicitudes) {
+      const f = s.step_data?.formulario;
+      if (f) {
+        arr.push({
+          id: f.id,
+          celular: f.celular,
+          monto: f.monto ?? null,
+          plazo: f.plazo ?? null,
+          paso_actual: f.paso_actual,
+          estado: f.estado || 'pendiente',
+          cliente_acepto: f.cliente_acepto || null,
+          created_at: s.created_at,
+          first_name: f.first_name || '',
+          second_name: f.second_name || '',
+          last_name: f.last_name || '',
+          second_last_name: f.second_last_name || '',
+          email: f.email || '',
+          document_number: f.document_number || '',
+          birth_date: f.birth_date || null,
+          document_issue_date: f.document_issue_date || null,
+          education_level: f.education_level || '',
+          marital_status: f.marital_status || '',
+          gender: f.gender || '',
+          department: f.department || '',
+          city: f.city || '',
+          locality: f.locality || '',
+          address: f.address || '',
+          employment_status: f.employment_status || '',
+          payment_cycle: f.payment_cycle || '',
+          income_range: f.income_range || '',
+          reference_one_relationship: f.reference_one_relationship || '',
+          reference_one_name: f.reference_one_name || '',
+          reference_one_phone: f.reference_one_phone || '',
+          reference_two_relationship: f.reference_two_relationship || '',
+          reference_two_name: f.reference_two_name || '',
+          reference_two_phone: f.reference_two_phone || '',
+          bank_name: f.bank_name || '',
+          account_number: f.account_number || '',
+          account_number_confirm: f.account_number_confirm || '',
+          id_front: f.id_front || null,
+          id_back: f.id_back || null,
+          selfie: f.selfie || null
+        });
+      }
+    }
+    return arr;
+  }
+  const { rows } = await pool.query(`
+    select 
+      id, celular, monto, plazo, paso_actual, estado, cliente_acepto, created_at,
+      first_name, second_name, last_name, second_last_name, email, document_number,
+      birth_date, document_issue_date, education_level, marital_status, gender,
+      department, city, locality, address, employment_status, payment_cycle, income_range,
+      reference_one_relationship, reference_one_name, reference_one_phone,
+      reference_two_relationship, reference_two_name, reference_two_phone,
+      bank_name, account_number, account_number_confirm,
+      id_front, id_back, selfie
+    from formularios 
+    order by id desc
+  `);
+  return rows;
+}
