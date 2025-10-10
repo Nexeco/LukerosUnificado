@@ -439,9 +439,10 @@
             'Banco': f.bank_name || '',
             'Número Cuenta': f.account_number || '',
             'Confirmación Cuenta': f.account_number_confirm || '',
-            'Foto ID Frontal': f.id_front ? 'Sí' : 'No',
-            'Foto ID Trasera': f.id_back ? 'Sí' : 'No',
-            'Selfie': f.selfie ? 'Sí' : 'No'
+            // Images come as "Sí" or "No" from backend
+            'Foto ID Frontal': f.id_front || 'No',
+            'Foto ID Trasera': f.id_back || 'No',
+            'Selfie': f.selfie || 'No'
           }));
           
           // Create workbook and worksheet

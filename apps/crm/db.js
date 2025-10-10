@@ -779,9 +779,10 @@ export async function downloadAllFormularios() {
           bank_name: f.bank_name || '',
           account_number: f.account_number || '',
           account_number_confirm: f.account_number_confirm || '',
-          id_front: f.id_front || null,
-          id_back: f.id_back || null,
-          selfie: f.selfie || null
+          // Only include boolean indicators for images, not the base64 data
+          id_front: f.id_front ? 'Sí' : 'No',
+          id_back: f.id_back ? 'Sí' : 'No',
+          selfie: f.selfie ? 'Sí' : 'No'
         });
       }
     }
@@ -796,7 +797,9 @@ export async function downloadAllFormularios() {
       reference_one_relationship, reference_one_name, reference_one_phone,
       reference_two_relationship, reference_two_name, reference_two_phone,
       bank_name, account_number, account_number_confirm,
-      id_front, id_back, selfie
+      case when id_front is not null then 'Sí' else 'No' end as id_front,
+      case when id_back is not null then 'Sí' else 'No' end as id_back,
+      case when selfie is not null then 'Sí' else 'No' end as selfie
     from formularios 
     order by id desc
   `);
