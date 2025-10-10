@@ -98,6 +98,7 @@
           <input class="input" id="c_phone" placeholder="Teléfono (10 dígitos)" />
           <input class="input" id="c_pass" placeholder="Contraseña" type="password" />
           <button class="btn primary" id="c_create">Crear</button>
+          <button class="btn" id="c_export">📥 Exportar Clientes</button>
         </div>
         <table id="tClientes"><thead><tr><th>ID</th><th>Teléfono</th><th>Creado</th><th>Acciones</th></tr></thead><tbody></tbody></table>
       </section>
@@ -122,6 +123,7 @@
           <input class="input" id="f_plazo" placeholder="Plazo (meses)" type="number" />
           <input class="input" id="f_pass" placeholder="Contraseña (si crea cliente)" type="password" />
           <button class="btn primary" id="f_create">Crear</button>
+          <button class="btn" id="f_export">📥 Exportar Formularios</button>
         </div>
   <table id="tForms"><thead><tr><th>ID</th><th>Nombre</th><th>Número</th><th>Estado</th><th>Cliente aceptó</th><th>Acciones</th></tr></thead><tbody></tbody></table>
         <dialog id="formModal" style="border:0; border-radius:12px; width:min(900px, 96vw);">
@@ -295,6 +297,34 @@
         if (!pass) { alert('Contraseña requerida'); return; }
         try { await api('POST','/admin/clients',{ phone, password: pass }); document.getElementById('c_phone').value=''; document.getElementById('c_pass').value=''; await loadData(); } catch(e){ alert('No se pudo crear: '+e.message); }
       });
+      // Export clients
+      document.getElementById('c_export').addEventListener('click', async () => {
+        const btn = document.getElementById('c_export');
+        const originalText = btn.textContent;
+        try {
+          btn.textContent = '⏳ Exportando...';
+          btn.disabled = true;
+          const r = await fetch('/admin/download/clientes', { credentials:'include' });
+          if (!r.ok) throw new Error('Error al exportar');
+          const data = await r.json();
+          if (!data.ok) throw new Error(data.error || 'Error al exportar');
+          const blob = new Blob([JSON.stringify(data.data, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `clientes-${new Date().toISOString().split('T')[0]}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          alert(`✅ Se exportaron ${data.count} clientes correctamente`);
+        } catch(e) {
+          alert('❌ Error al exportar clientes: ' + e.message);
+        } finally {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }
+      });
       // Save/delete client (event delegation)
       document.querySelector('#tClientes').addEventListener('click', async (ev) => {
         const btn = ev.target.closest('button'); if (!btn) return; const id = btn.dataset.id; const action = btn.dataset.action;
@@ -334,6 +364,34 @@
         if (!phoneValid(phone)) { alert('Teléfono inválido'); return; }
         try { await api('POST','/admin/forms',{ phone, monto, plazo, password: pass }); document.getElementById('f_phone').value=''; document.getElementById('f_monto').value=''; document.getElementById('f_plazo').value=''; document.getElementById('f_pass').value=''; await loadData(); }
         catch(e){ alert('No se pudo crear: '+e.message); }
+      });
+      // Export formularios
+      document.getElementById('f_export').addEventListener('click', async () => {
+        const btn = document.getElementById('f_export');
+        const originalText = btn.textContent;
+        try {
+          btn.textContent = '⏳ Exportando...';
+          btn.disabled = true;
+          const r = await fetch('/admin/download/formularios', { credentials:'include' });
+          if (!r.ok) throw new Error('Error al exportar');
+          const data = await r.json();
+          if (!data.ok) throw new Error(data.error || 'Error al exportar');
+          const blob = new Blob([JSON.stringify(data.data, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `formularios-${new Date().toISOString().split('T')[0]}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          alert(`✅ Se exportaron ${data.count} formularios correctamente`);
+        } catch(e) {
+          alert('❌ Error al exportar formularios: ' + e.message);
+        } finally {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }
       });
       // Ver más / Eliminar / Guardar desde modal
       const dlg = document.getElementById('formModal');
