@@ -12,6 +12,9 @@ pnpm-debug.log*
 .env.*
 !.env.example
 
+# Local JSON database (test data)
+crm.json
+
 # Build outputs
 /dist/
 /build/

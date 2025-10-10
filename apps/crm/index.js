@@ -5,7 +5,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { calcularValorPrestamo } from '@painita/calc';
-import { init, createSolicitud, updateStep, listSolicitudes, setDecision, getSolicitud as getSol, isPgEnabled, startFormularioForPhone, updateFormularioStep, getFormulario, phoneExists, getCounts, recentClientes, recentFormularios, loginCliente, loginAdmin, listUsuarios, createClient, updateClient, deleteClient, createUser, updateUser, deleteUser, createFormularioAdmin, updateFormularioAdmin, deleteFormularioAdmin } from './db.js';
+import { init, createSolicitud, updateStep, listSolicitudes, setDecision, getSolicitud as getSol, isPgEnabled, startFormularioForPhone, updateFormularioStep, getFormulario, phoneExists, getCounts, recentClientes, recentFormularios, loginCliente, loginAdmin, listUsuarios, createClient, updateClient, deleteClient, createUser, updateUser, deleteUser, createFormularioAdmin, updateFormularioAdmin, deleteFormularioAdmin, downloadAllClientes, downloadAllFormularios } from './db.js';
 import crypto from 'crypto';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -298,6 +298,25 @@ app.post('/calc', (req, res) => {
   const { monto, plazoMeses, tasa } = req.body;
   const cuota = calcularValorPrestamo(Number(monto||0), Number(plazoMeses||0), Number(tasa||0));
   res.json({ cuota });
+});
+
+// Download endpoints: export all records with complete information
+app.get('/admin/download/clientes', requireAdmin, async (req, res) => {
+  try {
+    const clientes = await downloadAllClientes();
+    res.json({ ok: true, data: clientes, count: clientes.length });
+  } catch (e) { 
+    res.status(500).json({ ok: false, error: e.message || 'download_failed' }); 
+  }
+});
+
+app.get('/admin/download/formularios', requireAdmin, async (req, res) => {
+  try {
+    const formularios = await downloadAllFormularios();
+    res.json({ ok: true, data: formularios, count: formularios.length });
+  } catch (e) { 
+    res.status(500).json({ ok: false, error: e.message || 'download_failed' }); 
+  }
 });
 
 init().then(() => {
