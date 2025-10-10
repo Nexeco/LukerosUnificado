@@ -30,6 +30,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+  <!-- SheetJS library for Excel export -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
   <script>
     function setActive(id) {
       document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
@@ -308,16 +310,36 @@
           if (!r.ok) throw new Error('Error al exportar');
           const data = await r.json();
           if (!data.ok) throw new Error(data.error || 'Error al exportar');
-          const blob = new Blob([JSON.stringify(data.data, null, 2)], { type: 'application/json' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `clientes-${new Date().toISOString().split('T')[0]}.json`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-          alert(`✅ Se exportaron ${data.count} clientes correctamente`);
+          
+          // Convert JSON to Excel format
+          const clientes = data.data || [];
+          
+          // Prepare data for Excel
+          const excelData = clientes.map(c => ({
+            'ID': c.id || '',
+            'Teléfono': c.phone || '',
+            'Fecha Creación': c.created_at || ''
+          }));
+          
+          // Create workbook and worksheet
+          const wb = XLSX.utils.book_new();
+          const ws = XLSX.utils.json_to_sheet(excelData);
+          
+          // Set column widths
+          ws['!cols'] = [
+            {wch: 8},  // ID
+            {wch: 15}, // Teléfono
+            {wch: 20}  // Fecha Creación
+          ];
+          
+          // Add worksheet to workbook
+          XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
+          
+          // Generate Excel file and download
+          const fileName = `clientes-${new Date().toISOString().split('T')[0]}.xlsx`;
+          XLSX.writeFile(wb, fileName);
+          
+          alert(`✅ Se exportaron ${data.count} clientes correctamente a Excel`);
         } catch(e) {
           alert('❌ Error al exportar clientes: ' + e.message);
         } finally {
@@ -376,16 +398,107 @@
           if (!r.ok) throw new Error('Error al exportar');
           const data = await r.json();
           if (!data.ok) throw new Error(data.error || 'Error al exportar');
-          const blob = new Blob([JSON.stringify(data.data, null, 2)], { type: 'application/json' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `formularios-${new Date().toISOString().split('T')[0]}.json`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-          alert(`✅ Se exportaron ${data.count} formularios correctamente`);
+          
+          // Convert JSON to Excel format
+          const formularios = data.data || [];
+          
+          // Prepare data for Excel - transform to flat structure
+          const excelData = formularios.map(f => ({
+            'ID': f.id || '',
+            'Celular': f.celular || '',
+            'Monto': f.monto || '',
+            'Plazo': f.plazo || '',
+            'Paso Actual': f.paso_actual || '',
+            'Estado': f.estado || '',
+            'Cliente Aceptó': f.cliente_acepto || '',
+            'Fecha Creación': f.created_at || '',
+            'Primer Nombre': f.first_name || '',
+            'Segundo Nombre': f.second_name || '',
+            'Primer Apellido': f.last_name || '',
+            'Segundo Apellido': f.second_last_name || '',
+            'Email': f.email || '',
+            'Número Documento': f.document_number || '',
+            'Fecha Nacimiento': f.birth_date || '',
+            'Fecha Expedición Doc': f.document_issue_date || '',
+            'Nivel Educativo': f.education_level || '',
+            'Estado Civil': f.marital_status || '',
+            'Género': f.gender || '',
+            'Departamento': f.department || '',
+            'Ciudad': f.city || '',
+            'Localidad': f.locality || '',
+            'Dirección': f.address || '',
+            'Estado Empleo': f.employment_status || '',
+            'Ciclo Pago': f.payment_cycle || '',
+            'Rango Ingresos': f.income_range || '',
+            'Ref 1 - Parentesco': f.reference_one_relationship || '',
+            'Ref 1 - Nombre': f.reference_one_name || '',
+            'Ref 1 - Teléfono': f.reference_one_phone || '',
+            'Ref 2 - Parentesco': f.reference_two_relationship || '',
+            'Ref 2 - Nombre': f.reference_two_name || '',
+            'Ref 2 - Teléfono': f.reference_two_phone || '',
+            'Banco': f.bank_name || '',
+            'Número Cuenta': f.account_number || '',
+            'Confirmación Cuenta': f.account_number_confirm || '',
+            'Foto ID Frontal': f.id_front ? 'Sí' : 'No',
+            'Foto ID Trasera': f.id_back ? 'Sí' : 'No',
+            'Selfie': f.selfie ? 'Sí' : 'No'
+          }));
+          
+          // Create workbook and worksheet
+          const wb = XLSX.utils.book_new();
+          const ws = XLSX.utils.json_to_sheet(excelData);
+          
+          // Set column widths for better readability
+          const colWidths = [
+            {wch: 8},  // ID
+            {wch: 15}, // Celular
+            {wch: 12}, // Monto
+            {wch: 8},  // Plazo
+            {wch: 12}, // Paso Actual
+            {wch: 12}, // Estado
+            {wch: 15}, // Cliente Aceptó
+            {wch: 20}, // Fecha Creación
+            {wch: 20}, // Primer Nombre
+            {wch: 20}, // Segundo Nombre
+            {wch: 20}, // Primer Apellido
+            {wch: 20}, // Segundo Apellido
+            {wch: 25}, // Email
+            {wch: 15}, // Número Documento
+            {wch: 15}, // Fecha Nacimiento
+            {wch: 18}, // Fecha Expedición
+            {wch: 18}, // Nivel Educativo
+            {wch: 15}, // Estado Civil
+            {wch: 10}, // Género
+            {wch: 18}, // Departamento
+            {wch: 18}, // Ciudad
+            {wch: 18}, // Localidad
+            {wch: 30}, // Dirección
+            {wch: 18}, // Estado Empleo
+            {wch: 15}, // Ciclo Pago
+            {wch: 18}, // Rango Ingresos
+            {wch: 18}, // Ref 1 - Parentesco
+            {wch: 25}, // Ref 1 - Nombre
+            {wch: 15}, // Ref 1 - Teléfono
+            {wch: 18}, // Ref 2 - Parentesco
+            {wch: 25}, // Ref 2 - Nombre
+            {wch: 15}, // Ref 2 - Teléfono
+            {wch: 20}, // Banco
+            {wch: 18}, // Número Cuenta
+            {wch: 18}, // Confirmación Cuenta
+            {wch: 15}, // Foto ID Frontal
+            {wch: 15}, // Foto ID Trasera
+            {wch: 10}  // Selfie
+          ];
+          ws['!cols'] = colWidths;
+          
+          // Add worksheet to workbook
+          XLSX.utils.book_append_sheet(wb, ws, 'Formularios');
+          
+          // Generate Excel file and download
+          const fileName = `formularios-${new Date().toISOString().split('T')[0]}.xlsx`;
+          XLSX.writeFile(wb, fileName);
+          
+          alert(`✅ Se exportaron ${data.count} formularios correctamente a Excel`);
         } catch(e) {
           alert('❌ Error al exportar formularios: ' + e.message);
         } finally {
