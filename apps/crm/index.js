@@ -331,9 +331,12 @@ app.get('/admin/download/formularios', requireAdmin, async (req, res) => {
 app.get('/admin/historial', requireAdmin, async (req, res) => {
   try {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : 100;
+    console.log('[CRM] GET /admin/historial - limit:', limit);
     const historial = await getHistorialCreditos(limit);
+    console.log('[CRM] Historial obtenido:', historial.length, 'registros');
     res.json({ ok: true, data: historial, count: historial.length });
   } catch (e) {
+    console.error('[CRM] Error obteniendo historial:', e);
     res.status(500).json({ ok: false, error: e.message || 'historial_failed' });
   }
 });

@@ -479,6 +479,7 @@ export async function updateFormularioAdmin(id, data = {}) {
     
     // Si cambió a desembolsado, agregar al historial
     if (cambiaADesembolsado && estadoAnterior !== 'desembolsado') {
+      console.log('[CRM] Agregando al historial - Formulario:', fid, 'Estado anterior:', estadoAnterior);
       await agregarHistorialCredito(fid, f);
     }
     
@@ -505,6 +506,7 @@ export async function updateFormularioAdmin(id, data = {}) {
   
   // Si cambió a desembolsado, agregar al historial
   if (cambiaADesembolsado && estadoAnterior !== 'desembolsado') {
+    console.log('[CRM] Agregando al historial (PG) - Formulario:', fid, 'Estado anterior:', estadoAnterior);
     await agregarHistorialCredito(fid, rows[0]);
   }
   
@@ -852,6 +854,7 @@ export async function downloadAllFormularios() {
 // Historial de créditos
 async function agregarHistorialCredito(formularioId, formularioData) {
   const fid = Number(formularioId);
+  console.log('[CRM] agregarHistorialCredito llamada - ID:', fid, 'Datos:', formularioData);
   
   if (!usePg) {
     const db = readFileDB();
@@ -881,10 +884,12 @@ async function agregarHistorialCredito(formularioId, formularioData) {
     
     db.historial_creditos.push(registro);
     writeFileDB(db);
+    console.log('[CRM] Registro agregado al historial (JSON):', registro);
     return registro;
   }
   
   // PostgreSQL
+  console.log('[CRM] Insertando en historial_creditos (PostgreSQL) - Formulario ID:', fid);
   const { rows } = await pool.query(`
     insert into historial_creditos (
       formulario_id, cliente_id, fecha_desembolso, monto, plazo,
@@ -905,11 +910,13 @@ async function agregarHistorialCredito(formularioId, formularioData) {
     returning *
   `, [fid]);
   
+  console.log('[CRM] Registro agregado al historial (PostgreSQL):', rows[0]);
   return rows[0] || null;
 }
 
 export async function getHistorialCreditos(limit = 100) {
   const lim = Math.max(1, Math.min(1000, Number(limit) || 100));
+  console.log('[CRM] getHistorialCreditos - limit:', lim, 'usePg:', usePg);
   
   if (!usePg) {
     const db = readFileDB();
@@ -917,6 +924,7 @@ export async function getHistorialCreditos(limit = 100) {
       .slice()
       .sort((a, b) => new Date(b.fecha_desembolso) - new Date(a.fecha_desembolso))
       .slice(0, lim);
+    console.log('[CRM] Historial desde JSON:', historial.length, 'registros');
     return historial;
   }
   
@@ -926,6 +934,7 @@ export async function getHistorialCreditos(limit = 100) {
     limit $1
   `, [lim]);
   
+  console.log('[CRM] Historial desde PostgreSQL:', rows.length, 'registros');
   return rows;
 }
 
