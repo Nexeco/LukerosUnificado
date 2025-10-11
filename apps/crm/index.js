@@ -47,6 +47,14 @@ app.get('/login.html', (req, res) => {
   res.set('Cache-Control', 'no-store');
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
+app.get('/pago-exitoso', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, 'public', 'pago-exitoso.html'));
+});
+app.get('/pago-exitoso.html', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, 'public', 'pago-exitoso.html'));
+});
 app.get('/details/:id', (req, res) => {
   res.redirect(`/details.html?id=${encodeURIComponent(req.params.id)}`);
 });

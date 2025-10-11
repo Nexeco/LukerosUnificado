@@ -211,7 +211,7 @@
       formulariosList.slice(start, end).forEach(x => {
         const tr = document.createElement('tr');
         const estado = (String(x.estado||'pendiente').toLowerCase() === 'rechazado') ? 'negado' : (x.estado || 'pendiente');
-        const options = ['pendiente','en_espera','aprobado','desembolsado','negado']
+        const options = ['pendiente','en_espera','aprobado','desembolsado','pagado','negado']
           .map(o => `<option ${o===estado?'selected':''} value="${o}">${o}</option>`).join('');
         tr.innerHTML = `<td>${x.id}</td>
           <td>${fullName(x)}</td>
@@ -554,6 +554,11 @@
           const msg = `Desglose:\n- Interés: ${formatCOP(desg.interesEA)}\n- Seguro: ${formatCOP(desg.seguro)}\n- Fianza (c/IVA): ${formatCOP(desg.fianza)}\n- Administración: ${formatCOP(desg.administracion)}\n- IVA administración: ${formatCOP(desg.ivaAdministracion)}\nTOTAL A PAGAR: ${formatCOP(desg.totalPagar)}\n\n¿Confirmar aprobación?`;
           if (!confirm(msg)) return;
         }
+        // Si se marca como pagado, confirmar
+        if (String(data.estado||'').toLowerCase() === 'pagado') {
+          const confirmado = confirm('¿Marcar este préstamo como pagado?\n\nEl cliente verá un mensaje de agradecimiento y podrá solicitar un nuevo crédito.');
+          if (!confirmado) return;
+        }
         try { await api('PATCH', `/admin/forms/${currentFormId}`, data); await loadData(); }
         catch(e){ alert('No se pudo guardar: '+e.message); }
       });
@@ -570,7 +575,7 @@
               field('Monto', x.monto, 'monto'),
               field('Plazo', x.plazo, 'plazo'),
               field('Paso actual', x.paso_actual, 'paso_actual'),
-              selectField('Estado', estadoVal, 'estado', ['pendiente','en_espera','aprobado','desembolsado','negado']),
+              selectField('Estado', estadoVal, 'estado', ['pendiente','en_espera','aprobado','desembolsado','pagado','negado']),
               selectField('Cliente aceptó', (x.cliente_acepto||'en espera'), 'cliente_acepto', ['en espera','si']),
               field('Primer nombre', x.first_name, 'first_name'),
               field('Segundo nombre', x.second_name, 'second_name'),
@@ -640,6 +645,16 @@
         } else if (estado === 'desembolsado') {
           // Permitir marcar desembolsado sin prompts adicionales (monto/plazo ya deberían existir)
           try { await api('PATCH', `/admin/forms/${id}`, { estado }); }
+          catch(e){ alert('No se pudo actualizar: '+e.message); sel.value = sel.dataset.prev || 'pendiente'; }
+          return;
+        } else if (estado === 'pagado') {
+          // Al marcar como pagado, mostrar confirmación y enlace
+          const confirmado = confirm('¿Marcar este préstamo como pagado?\n\nEl cliente verá un mensaje de agradecimiento y podrá solicitar un nuevo crédito.');
+          if (!confirmado) { sel.value = sel.dataset.prev || 'pendiente'; return; }
+          try { 
+            await api('PATCH', `/admin/forms/${id}`, { estado }); 
+            alert('✅ Préstamo marcado como pagado.\n\nEnlace para el cliente: /pago-exitoso');
+          }
           catch(e){ alert('No se pudo actualizar: '+e.message); sel.value = sel.dataset.prev || 'pendiente'; }
           return;
         }
