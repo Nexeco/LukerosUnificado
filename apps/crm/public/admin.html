@@ -403,47 +403,55 @@
           const formularios = data.data || [];
           
           // Prepare data for Excel - transform to flat structure
-          const excelData = formularios.map(f => ({
-            'ID': f.id || '',
-            'Celular': f.celular || '',
-            'Monto': f.monto || '',
-            'Plazo': f.plazo || '',
-            'Paso Actual': f.paso_actual || '',
-            'Estado': f.estado || '',
-            'Cliente Aceptó': f.cliente_acepto || '',
-            'Fecha Creación': f.created_at || '',
-            'Primer Nombre': f.first_name || '',
-            'Segundo Nombre': f.second_name || '',
-            'Primer Apellido': f.last_name || '',
-            'Segundo Apellido': f.second_last_name || '',
-            'Email': f.email || '',
-            'Número Documento': f.document_number || '',
-            'Fecha Nacimiento': f.birth_date || '',
-            'Fecha Expedición Doc': f.document_issue_date || '',
-            'Nivel Educativo': f.education_level || '',
-            'Estado Civil': f.marital_status || '',
-            'Género': f.gender || '',
-            'Departamento': f.department || '',
-            'Ciudad': f.city || '',
-            'Localidad': f.locality || '',
-            'Dirección': f.address || '',
-            'Estado Empleo': f.employment_status || '',
-            'Ciclo Pago': f.payment_cycle || '',
-            'Rango Ingresos': f.income_range || '',
-            'Ref 1 - Parentesco': f.reference_one_relationship || '',
-            'Ref 1 - Nombre': f.reference_one_name || '',
-            'Ref 1 - Teléfono': f.reference_one_phone || '',
-            'Ref 2 - Parentesco': f.reference_two_relationship || '',
-            'Ref 2 - Nombre': f.reference_two_name || '',
-            'Ref 2 - Teléfono': f.reference_two_phone || '',
-            'Banco': f.bank_name || '',
-            'Número Cuenta': f.account_number || '',
-            'Confirmación Cuenta': f.account_number_confirm || '',
-            // Images come as "Sí" or "No" from backend
-            'Foto ID Frontal': f.id_front || 'No',
-            'Foto ID Trasera': f.id_back || 'No',
-            'Selfie': f.selfie || 'No'
-          }));
+          const excelData = formularios.map(f => {
+            // Concatenate full name
+            const nombreCompleto = [f.first_name, f.second_name, f.last_name, f.second_last_name]
+              .filter(Boolean)
+              .join(' ')
+              .trim() || '';
+            
+            // Format amount as COP currency
+            const montoCOP = f.monto ? `$${Number(f.monto).toLocaleString('es-CO', { maximumFractionDigits: 0 })}` : '';
+            
+            return {
+              'ID': f.id || '',
+              'Nombre Completo': nombreCompleto,
+              'Celular': f.celular || '',
+              'Monto': montoCOP,
+              'Plazo': f.plazo || '',
+              'Paso Actual': f.paso_actual || '',
+              'Estado': f.estado || '',
+              'Cliente Aceptó': f.cliente_acepto || '',
+              'Fecha Creación': f.created_at || '',
+              'Email': f.email || '',
+              'Número Documento': f.document_number || '',
+              'Fecha Nacimiento': f.birth_date || '',
+              'Fecha Expedición Doc': f.document_issue_date || '',
+              'Nivel Educativo': f.education_level || '',
+              'Estado Civil': f.marital_status || '',
+              'Género': f.gender || '',
+              'Departamento': f.department || '',
+              'Ciudad': f.city || '',
+              'Localidad': f.locality || '',
+              'Dirección': f.address || '',
+              'Estado Empleo': f.employment_status || '',
+              'Ciclo Pago': f.payment_cycle || '',
+              'Rango Ingresos': f.income_range || '',
+              'Ref 1 - Parentesco': f.reference_one_relationship || '',
+              'Ref 1 - Nombre': f.reference_one_name || '',
+              'Ref 1 - Teléfono': f.reference_one_phone || '',
+              'Ref 2 - Parentesco': f.reference_two_relationship || '',
+              'Ref 2 - Nombre': f.reference_two_name || '',
+              'Ref 2 - Teléfono': f.reference_two_phone || '',
+              'Banco': f.bank_name || '',
+              'Número Cuenta': f.account_number || '',
+              'Confirmación Cuenta': f.account_number_confirm || '',
+              // Images come as "Sí" or "No" from backend
+              'Foto ID Frontal': f.id_front || 'No',
+              'Foto ID Trasera': f.id_back || 'No',
+              'Selfie': f.selfie || 'No'
+            };
+          });
           
           // Create workbook and worksheet
           const wb = XLSX.utils.book_new();
@@ -452,17 +460,14 @@
           // Set column widths for better readability
           const colWidths = [
             {wch: 8},  // ID
+            {wch: 50}, // Nombre Completo
             {wch: 15}, // Celular
-            {wch: 12}, // Monto
+            {wch: 18}, // Monto (formato COP)
             {wch: 8},  // Plazo
             {wch: 12}, // Paso Actual
             {wch: 12}, // Estado
             {wch: 15}, // Cliente Aceptó
             {wch: 20}, // Fecha Creación
-            {wch: 20}, // Primer Nombre
-            {wch: 20}, // Segundo Nombre
-            {wch: 20}, // Primer Apellido
-            {wch: 20}, // Segundo Apellido
             {wch: 25}, // Email
             {wch: 15}, // Número Documento
             {wch: 15}, // Fecha Nacimiento

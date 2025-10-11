@@ -10,10 +10,11 @@ Se ha actualizado la funcionalidad de exportación en el panel de administració
 
 Al hacer clic en el botón "📥 Exportar Formularios", se genera un archivo Excel con **todos los campos** de los formularios:
 
-#### Campos incluidos (38 columnas):
+#### Campos incluidos (35 columnas):
 
 1. **Información Básica:**
    - ID
+   - Nombre Completo (Primer Nombre + Segundo Nombre + Primer Apellido + Segundo Apellido)
    - Celular
    - Monto
    - Plazo
@@ -23,10 +24,6 @@ Al hacer clic en el botón "📥 Exportar Formularios", se genera un archivo Exc
    - Fecha Creación
 
 2. **Datos Personales:**
-   - Primer Nombre
-   - Segundo Nombre
-   - Primer Apellido
-   - Segundo Apellido
    - Email
    - Número Documento
    - Fecha Nacimiento
@@ -100,7 +97,8 @@ Al hacer clic en el botón "📥 Exportar Clientes", se genera un archivo Excel 
 ✅ **Filtros y ordenamiento:** Excel permite filtrar y ordenar datos fácilmente  
 ✅ **Análisis de datos:** Compatible con tablas dinámicas y gráficos  
 ✅ **Formato estructurado:** Columnas bien definidas y con anchos apropiados  
-✅ **Información completa:** Todos los 38 campos de cada formulario incluidos  
+✅ **Información completa:** Todos los campos de cada formulario incluidos (35 columnas)  
+✅ **Nombre completo:** Los nombres se concatenan automáticamente en una sola columna  
 ✅ **Compatible:** Funciona en Windows, Mac, Linux, y navegadores web
 
 ## Notas Técnicas
