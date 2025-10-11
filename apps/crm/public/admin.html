@@ -91,6 +91,7 @@
         <a href="#usuarios-web" class="active">Usuarios Web</a>
         <a href="#usuarios-crm">Usuarios CRM</a>
         <a href="#formularios">Formularios</a>
+        <a href="#historial">Historial Créditos</a>
       </nav>
     </aside>
     <main class="content">
@@ -142,6 +143,29 @@
             </div>
           </div>
         </dialog>
+      </section>
+      <section id="historial">
+        <h2>Historial de Créditos Desembolsados</h2>
+        <div class="form-row" style="margin-bottom: 12px;">
+          <button class="btn" id="h_refresh">🔄 Actualizar</button>
+          <button class="btn" id="h_export">📥 Exportar Historial</button>
+        </div>
+        <table id="tHistorial">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Fecha Desembolso</th>
+              <th>Nombre Completo</th>
+              <th>Documento</th>
+              <th>Celular</th>
+              <th>Monto</th>
+              <th>Plazo (días)</th>
+              <th>Estado Préstamo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </section>
     </main>
   </div>
@@ -289,6 +313,49 @@
   renderUsuarios(d.usuarios||[]);
   renderFormularios(d.formularios||[]);
       } catch {}
+      // Cargar historial también
+      await loadHistorial();
+    }
+    async function loadHistorial() {
+      try {
+        const r = await fetch('/admin/historial?limit=200', { credentials:'include' });
+        if (!r.ok) return;
+        const d = await r.json();
+        if (!d.ok) return;
+        renderHistorial(d.data||[]);
+      } catch (e) {
+        console.error('Error cargando historial:', e);
+      }
+    }
+    function renderHistorial(list) {
+      const tb = document.querySelector('#tHistorial tbody');
+      tb.innerHTML = '';
+      if (list.length === 0) {
+        tb.innerHTML = '<tr><td colspan="9" style="text-align:center; color:#999;">No hay créditos desembolsados aún</td></tr>';
+        return;
+      }
+      list.forEach(h => {
+        const tr = document.createElement('tr');
+        const fecha = new Date(h.fecha_desembolso).toLocaleDateString('es-CO', { 
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit'
+        });
+        const montoCOP = h.monto ? `$${Number(h.monto).toLocaleString('es-CO', { maximumFractionDigits: 0 })}` : '';
+        const estadoOptions = ['activo','pagado','vencido','cancelado']
+          .map(e => `<option ${e===h.estado_prestamo?'selected':''} value="${e}">${e}</option>`).join('');
+        tr.innerHTML = `
+          <td>${h.id}</td>
+          <td>${fecha}</td>
+          <td>${h.nombre_completo||''}</td>
+          <td>${h.documento_numero||''}</td>
+          <td>${h.celular||''}</td>
+          <td>${montoCOP}</td>
+          <td>${h.plazo||''}</td>
+          <td><select class="input h_estado" data-id="${h.id}">${estadoOptions}</select></td>
+          <td><button class="btn link" data-action="verform" data-formid="${h.formulario_id}">Ver Formulario</button></td>
+        `;
+        tb.appendChild(tr);
+      });
     }
     window.addEventListener('DOMContentLoaded', () => {
       // Create client
@@ -661,6 +728,81 @@
         try { await api('PATCH', `/admin/forms/${id}`, { estado }); }
         catch(e){ alert('No se pudo actualizar el estado: '+e.message); sel.value = sel.dataset.prev || 'pendiente'; }
       });
+      
+      // Historial - Botón refrescar
+      document.getElementById('h_refresh').addEventListener('click', async () => {
+        await loadHistorial();
+      });
+      
+      // Historial - Exportar
+      document.getElementById('h_export').addEventListener('click', async () => {
+        const btn = document.getElementById('h_export');
+        const originalText = btn.textContent;
+        try {
+          btn.textContent = '⏳ Exportando...';
+          btn.disabled = true;
+          const r = await fetch('/admin/historial?limit=1000', { credentials:'include' });
+          if (!r.ok) throw new Error('Error al exportar');
+          const data = await r.json();
+          if (!data.ok) throw new Error(data.error || 'Error al exportar');
+          
+          const historial = data.data || [];
+          const excelData = historial.map(h => {
+            const fecha = new Date(h.fecha_desembolso).toLocaleString('es-CO');
+            const montoCOP = h.monto ? `$${Number(h.monto).toLocaleString('es-CO', { maximumFractionDigits: 0 })}` : '';
+            return {
+              'ID': h.id || '',
+              'Fecha Desembolso': fecha,
+              'Nombre Completo': h.nombre_completo || '',
+              'Documento': h.documento_numero || '',
+              'Celular': h.celular || '',
+              'Monto': montoCOP,
+              'Plazo (días)': h.plazo || '',
+              'Estado Préstamo': h.estado_prestamo || '',
+              'ID Formulario': h.formulario_id || ''
+            };
+          });
+          
+          const wb = XLSX.utils.book_new();
+          const ws = XLSX.utils.json_to_sheet(excelData);
+          ws['!cols'] = [
+            {wch: 8},  // ID
+            {wch: 20}, // Fecha
+            {wch: 40}, // Nombre
+            {wch: 15}, // Documento
+            {wch: 15}, // Celular
+            {wch: 18}, // Monto
+            {wch: 12}, // Plazo
+            {wch: 15}, // Estado
+            {wch: 12}  // ID Form
+          ];
+          XLSX.utils.book_append_sheet(wb, ws, 'Historial Créditos');
+          const fileName = `historial-creditos-${new Date().toISOString().split('T')[0]}.xlsx`;
+          XLSX.writeFile(wb, fileName);
+          
+          alert(`✅ Se exportaron ${data.count} registros correctamente a Excel`);
+        } catch(e) {
+          alert('❌ Error al exportar historial: ' + e.message);
+        } finally {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }
+      });
+      
+      // Historial - Cambiar estado del préstamo
+      document.querySelector('#tHistorial').addEventListener('change', async (ev) => {
+        const sel = ev.target.closest('select.h_estado');
+        if (!sel) return;
+        const id = sel.dataset.id;
+        const nuevoEstado = sel.value;
+        try {
+          await api('PATCH', `/admin/historial/${id}`, { estado_prestamo: nuevoEstado });
+          alert(`✅ Estado del préstamo actualizado a: ${nuevoEstado}`);
+        } catch(e) {
+          alert('❌ Error al actualizar estado: ' + e.message);
+        }
+      });
+      
       loadData();
     });
   </script>

@@ -5,7 +5,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { calcularValorPrestamo } from '@painita/calc';
-import { init, createSolicitud, updateStep, listSolicitudes, setDecision, getSolicitud as getSol, isPgEnabled, startFormularioForPhone, updateFormularioStep, getFormulario, phoneExists, getCounts, recentClientes, recentFormularios, loginCliente, loginAdmin, listUsuarios, createClient, updateClient, deleteClient, createUser, updateUser, deleteUser, createFormularioAdmin, updateFormularioAdmin, deleteFormularioAdmin, downloadAllClientes, downloadAllFormularios } from './db.js';
+import { init, createSolicitud, updateStep, listSolicitudes, setDecision, getSolicitud as getSol, isPgEnabled, startFormularioForPhone, updateFormularioStep, getFormulario, phoneExists, getCounts, recentClientes, recentFormularios, loginCliente, loginAdmin, listUsuarios, createClient, updateClient, deleteClient, createUser, updateUser, deleteUser, createFormularioAdmin, updateFormularioAdmin, deleteFormularioAdmin, downloadAllClientes, downloadAllFormularios, getHistorialCreditos, getHistorialPorCliente, actualizarEstadoPrestamo } from './db.js';
 import crypto from 'crypto';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -324,6 +324,37 @@ app.get('/admin/download/formularios', requireAdmin, async (req, res) => {
     res.json({ ok: true, data: formularios, count: formularios.length });
   } catch (e) { 
     res.status(500).json({ ok: false, error: e.message || 'download_failed' }); 
+  }
+});
+
+// Historial de créditos
+app.get('/admin/historial', requireAdmin, async (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 100;
+    const historial = await getHistorialCreditos(limit);
+    res.json({ ok: true, data: historial, count: historial.length });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message || 'historial_failed' });
+  }
+});
+
+app.get('/admin/historial/cliente/:clienteId', requireAdmin, async (req, res) => {
+  try {
+    const historial = await getHistorialPorCliente(req.params.clienteId);
+    res.json({ ok: true, data: historial, count: historial.length });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message || 'historial_failed' });
+  }
+});
+
+app.patch('/admin/historial/:id', requireAdmin, async (req, res) => {
+  try {
+    const { estado_prestamo } = req.body;
+    if (!estado_prestamo) return res.status(400).json({ ok: false, error: 'estado_prestamo_required' });
+    const updated = await actualizarEstadoPrestamo(req.params.id, estado_prestamo);
+    res.json({ ok: true, data: updated });
+  } catch (e) {
+    res.status(e.status || 500).json({ ok: false, error: e.message || 'update_failed' });
   }
 });
 

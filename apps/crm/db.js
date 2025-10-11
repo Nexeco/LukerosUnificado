@@ -10,7 +10,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_FILE = path.resolve('crm.json');
 
 function readFileDB() {
-  try { return JSON.parse(fs.readFileSync(DB_FILE, 'utf8')); } catch { return { solicitudes: [], lastId: 0 }; }
+  try { return JSON.parse(fs.readFileSync(DB_FILE, 'utf8')); } catch { return { solicitudes: [], lastId: 0, historial_creditos: [] }; }
 }
 function writeFileDB(db) { fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2)); }
 
@@ -104,6 +104,24 @@ export async function init() {
       created_at timestamptz not null default now()
     );
     create index if not exists idx_usuarios_email on usuarios(email);
+
+    -- Historial de créditos desembolsados
+    create table if not exists historial_creditos (
+      id serial primary key,
+      formulario_id integer references formularios(id) on delete cascade,
+      cliente_id integer references clientes(id) on delete set null,
+      fecha_desembolso timestamptz not null default now(),
+      monto numeric(12,2) not null,
+      plazo integer,
+      documento_numero varchar(20),
+      nombre_completo varchar(255),
+      celular varchar(15),
+      estado_prestamo varchar(30) default 'activo',
+      created_at timestamptz not null default now()
+    );
+    create index if not exists idx_historial_cliente_id on historial_creditos(cliente_id);
+    create index if not exists idx_historial_formulario_id on historial_creditos(formulario_id);
+    create index if not exists idx_historial_fecha on historial_creditos(fecha_desembolso);
   `);
 
   // Ensure image columns are wide enough (text) for base64/data URLs
@@ -435,6 +453,10 @@ export async function updateFormularioAdmin(id, data = {}) {
   const fid = Number(id);
   // Allow updating any formulario column defined in FORM_COLUMNS
   const allowed = FORM_COLUMNS;
+  
+  // Verificar si se está cambiando a estado "desembolsado"
+  const cambiaADesembolsado = data && data.estado && String(data.estado).toLowerCase() === 'desembolsado';
+  
   // Normalize/validate estado if present
   if (data && 'estado' in data) {
     const raw = String(data.estado||'').toLowerCase();
@@ -447,11 +469,26 @@ export async function updateFormularioAdmin(id, data = {}) {
     const s = db.solicitudes.find(x => x.id === fid);
     if (!s || !s.step_data?.formulario) throw Object.assign(new Error('not found'), { status: 404 });
     const f = s.step_data.formulario;
+    
+    // Guardar estado anterior para detectar cambio
+    const estadoAnterior = f.estado;
+    
     allowed.forEach(k => { if (k in data) f[k] = data[k]; });
     s.step_data.formulario = f;
     writeFileDB(db);
+    
+    // Si cambió a desembolsado, agregar al historial
+    if (cambiaADesembolsado && estadoAnterior !== 'desembolsado') {
+      await agregarHistorialCredito(fid, f);
+    }
+    
     return f;
   }
+  
+  // PostgreSQL - Primero obtener el estado actual
+  const { rows: currentRows } = await pool.query('select estado from formularios where id=$1', [fid]);
+  const estadoAnterior = currentRows.length > 0 ? currentRows[0].estado : null;
+  
   const sets = [];
   const vals = [];
   let i = 1;
@@ -465,6 +502,12 @@ export async function updateFormularioAdmin(id, data = {}) {
   const q = `update formularios set ${sets.join(', ')} where id=$${i} returning *`;
   const { rows } = await pool.query(q, vals);
   if (!rows.length) throw Object.assign(new Error('not found'), { status: 404 });
+  
+  // Si cambió a desembolsado, agregar al historial
+  if (cambiaADesembolsado && estadoAnterior !== 'desembolsado') {
+    await agregarHistorialCredito(fid, rows[0]);
+  }
+  
   return rows[0];
 }
 
@@ -804,4 +847,133 @@ export async function downloadAllFormularios() {
     order by id desc
   `);
   return rows;
+}
+
+// Historial de créditos
+async function agregarHistorialCredito(formularioId, formularioData) {
+  const fid = Number(formularioId);
+  
+  if (!usePg) {
+    const db = readFileDB();
+    db.historial_creditos = db.historial_creditos || [];
+    
+    // Construir nombre completo
+    const nombreCompleto = [
+      formularioData.first_name,
+      formularioData.second_name,
+      formularioData.last_name,
+      formularioData.second_last_name
+    ].filter(Boolean).join(' ').trim();
+    
+    const registro = {
+      id: (db.historial_creditos.length > 0 ? Math.max(...db.historial_creditos.map(h => h.id)) + 1 : 1),
+      formulario_id: fid,
+      cliente_id: formularioData.cliente_id || null,
+      fecha_desembolso: new Date().toISOString(),
+      monto: Number(formularioData.monto) || 0,
+      plazo: Number(formularioData.plazo) || null,
+      documento_numero: formularioData.document_number || '',
+      nombre_completo: nombreCompleto || '',
+      celular: formularioData.celular || '',
+      estado_prestamo: 'activo',
+      created_at: new Date().toISOString()
+    };
+    
+    db.historial_creditos.push(registro);
+    writeFileDB(db);
+    return registro;
+  }
+  
+  // PostgreSQL
+  const { rows } = await pool.query(`
+    insert into historial_creditos (
+      formulario_id, cliente_id, fecha_desembolso, monto, plazo,
+      documento_numero, nombre_completo, celular, estado_prestamo
+    )
+    select 
+      $1,
+      cliente_id,
+      now(),
+      monto,
+      plazo,
+      document_number,
+      concat_ws(' ', first_name, second_name, last_name, second_last_name),
+      celular,
+      'activo'
+    from formularios
+    where id = $1
+    returning *
+  `, [fid]);
+  
+  return rows[0] || null;
+}
+
+export async function getHistorialCreditos(limit = 100) {
+  const lim = Math.max(1, Math.min(1000, Number(limit) || 100));
+  
+  if (!usePg) {
+    const db = readFileDB();
+    const historial = (db.historial_creditos || [])
+      .slice()
+      .sort((a, b) => new Date(b.fecha_desembolso) - new Date(a.fecha_desembolso))
+      .slice(0, lim);
+    return historial;
+  }
+  
+  const { rows } = await pool.query(`
+    select * from historial_creditos
+    order by fecha_desembolso desc
+    limit $1
+  `, [lim]);
+  
+  return rows;
+}
+
+export async function getHistorialPorCliente(clienteId) {
+  const cid = Number(clienteId);
+  
+  if (!usePg) {
+    const db = readFileDB();
+    const historial = (db.historial_creditos || [])
+      .filter(h => h.cliente_id === cid)
+      .sort((a, b) => new Date(b.fecha_desembolso) - new Date(a.fecha_desembolso));
+    return historial;
+  }
+  
+  const { rows } = await pool.query(`
+    select * from historial_creditos
+    where cliente_id = $1
+    order by fecha_desembolso desc
+  `, [cid]);
+  
+  return rows;
+}
+
+export async function actualizarEstadoPrestamo(historialId, nuevoEstado) {
+  const hid = Number(historialId);
+  const estadosValidos = ['activo', 'pagado', 'vencido', 'cancelado'];
+  
+  if (!estadosValidos.includes(nuevoEstado)) {
+    throw new Error('Estado de préstamo inválido');
+  }
+  
+  if (!usePg) {
+    const db = readFileDB();
+    db.historial_creditos = db.historial_creditos || [];
+    const registro = db.historial_creditos.find(h => h.id === hid);
+    if (!registro) throw Object.assign(new Error('not found'), { status: 404 });
+    registro.estado_prestamo = nuevoEstado;
+    writeFileDB(db);
+    return registro;
+  }
+  
+  const { rows } = await pool.query(`
+    update historial_creditos
+    set estado_prestamo = $1
+    where id = $2
+    returning *
+  `, [nuevoEstado, hid]);
+  
+  if (!rows.length) throw Object.assign(new Error('not found'), { status: 404 });
+  return rows[0];
 }
