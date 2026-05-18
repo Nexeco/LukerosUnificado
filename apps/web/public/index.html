@@ -10,7 +10,7 @@
   <link rel="icon" href="data:," />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -171,7 +171,7 @@
 
       if (state.fase === 'calculadora') {
         sections.push(HeroHeading());
-  const row = document.createElement('div'); row.className = 'container-row paired no-gap spaced';
+  const row = document.createElement('div'); row.className = 'container-row paired no-gap spaced'; row.id = 'calculadora';
         // Mounts
         const calc = CalculatorPanel({
           monto: state.monto,

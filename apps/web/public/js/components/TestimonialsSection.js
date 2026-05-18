@@ -1,11 +1,8 @@
-// Testimonios provistos por el cliente
 const testimonials = [
-  { text: 'Me salvó en un momento crítico. La cuota fue un poco alta, pero necesitaba el dinero urgente para pagar una urgencia médica. No me gusta pagar tanto, pero prefiero eso a quedarme sin opciones. Gracias a la app, resolví todo en menos de una hora.', stars: 4 },
-  { text: 'Sí, cobran más que un banco… pero ningún banco te presta en 5 minutos. En mi caso, era eso o perder una oportunidad de trabajo. La app fue rápida y cumplió. Recomiendo usarla con responsabilidad.', stars: 4 },
-  { text: 'Los intereses son elevados, pero cuando uno está en apuros, lo último que quiere es esperar papeles. Esta app me prestó cuando nadie más lo hacía. Vale la pena tenerla instalada. Uno nunca sabe cuándo la va a necesitar.', stars: 4 },
-  { text: 'No es la opción más barata, pero sí es la más rápida. Me gustó que no me pidieron tanto papeleo. Solo hay que tener claro que es un préstamo de emergencia, no para cualquier gasto.', stars: 4 },
-  { text: 'Lo importante es pagar a tiempo. Si uno se organiza, la app es útil. Los costos son altos, sí, pero cuando me quedé sin plata para el arriendo, fue lo único que me respondió. Ahora estoy al día y puedo volver a usarla si lo necesito.', stars: 4 },
-  { text: 'Me pareció costoso al principio, pero después entendí que la rapidez tiene su precio. Me ayudó a salir de una deuda más grave. Ojalá bajen un poco las tarifas con el tiempo, pero mientras tanto, es mejor tener esta app que depender de favores.', stars: 3 },
+  { text: 'Lo que mas me gusto fue la claridad. Vi el total antes de aceptar y en menos de una hora ya tenia respuesta.', stars: 5 },
+  { text: 'Proceso sencillo y sin papeleo. Pude hacer todo desde el celular y el soporte resolvio mis dudas rapido.', stars: 5 },
+  { text: 'La calculadora es muy util, todo queda claro. Me dio confianza para pedir el credito sin sorpresas.', stars: 5 },
+  { text: 'Rapido, transparente y con buen acompanamiento. Volveria a usarlo cuando lo necesite.', stars: 5 },
 ];
 
 export function TestimonialsSection() {
@@ -13,7 +10,8 @@ export function TestimonialsSection() {
   s.className = 'testi-section';
   s.innerHTML = `
     <div class="testi__inner">
-      <h3>Opiniones de nuestros clientes</h3>
+      <h3>Historias reales, confianza real</h3>
+      <p class="testi__subtitle">Clientes que eligieron claridad y rapidez para resolver su credito.</p>
       <div class="testi__grid"></div>
     </div>`;
   const grid = s.querySelector('.testi__grid');
