@@ -3,9 +3,9 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import fetch from 'node-fetch';
 import cors from 'cors';
-import { calcularValorPrestamo } from '@painita/calc';
-import { CRMClient } from '@painita/crm-client';
-import { createTumipayPayment, buildPaymentLink } from '@painita/tumipay';
+import { calcularValorPrestamo } from '@lukeros/calc';
+import { CRMClient } from '@lukeros/crm-client';
+import { createTumipayPayment, buildPaymentLink } from '@lukeros/tumipay';
 import { calcularDesglose } from './public/js/utils/finanzas.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -202,7 +202,7 @@ const LEGACY_DIR = resolveLegacyDir(LEGACY_BASE);
 app.get('/adapter.js', (req, res) => {
   res.type('application/javascript').send(`(function(){
     function createSync(base){
-      const key='painita_solicitud_id';
+      const key='lukeros_solicitud_id';
       const getId=()=>localStorage.getItem(key);
       const setId=(id)=>localStorage.setItem(key,String(id));
   return { 
@@ -218,7 +218,7 @@ app.get('/adapter.js', (req, res) => {
         getId
       };
     }
-    window.PainitaFormSync=createSync(location.origin);
+    window.LukerosFormSync=createSync(location.origin);
   })();`);
 });
 

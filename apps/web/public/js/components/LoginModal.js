@@ -72,7 +72,7 @@ export function LoginModal({ onLogin, onClose }) {
       margin-bottom: 16px;
     }
     .error-message {
-      color: #b00020;
+      color: var(--primary, #1E4FB3);
       font-size: 0.9rem;
       margin-bottom: 16px;
       min-height: 20px;

@@ -3,13 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pago Exitoso - Painita</title>
+  <title>Pago Exitoso - Lukeros</title>
   <style>
     :root { 
-      --primary: #B00020; 
+      --primary: #1E4FB3; 
+      --accent: #F6C945;
       --white: #fff; 
       --black: #000; 
-      --success: #4CAF50;
+      --success: var(--primary);
     }
     * { box-sizing: border-box; }
     body { 
@@ -47,7 +48,7 @@
       margin: 0 auto 24px;
       width: 120px;
       height: 120px;
-      background: linear-gradient(135deg, var(--success) 0%, #45a049 100%);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -98,7 +99,7 @@
       border-radius: 12px;
       padding: 24px;
       margin: 24px 0;
-      border-left: 4px solid var(--success);
+      border-left: 4px solid var(--accent);
     }
     .info-box p {
       margin: 0;
@@ -122,9 +123,9 @@
       margin-top: 16px;
     }
     .btn:hover {
-      background: #8b0018;
+      background: #173B86;
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(176, 0, 32, 0.3);
+      box-shadow: 0 6px 20px rgba(30, 79, 179, 0.3);
     }
     .brand {
       font-family: 'Playfair Display', serif;
@@ -179,7 +180,7 @@
     
     <a href="/" class="btn">Volver al inicio</a>
     
-    <div class="brand">Painita</div>
+    <div class="brand">Lukeros</div>
   </div>
   
   <script>

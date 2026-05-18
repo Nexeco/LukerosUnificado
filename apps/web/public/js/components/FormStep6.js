@@ -65,7 +65,7 @@ export function FormStep6() {
       const f = file.files && file.files[0]; if (!f) return;
       try {
         // Contador de reintentos
-        const key = `painita_id_retake_count_${clsKey}`;
+        const key = `lukeros_id_retake_count_${clsKey}`;
         let count = 0; try { count = parseInt(localStorage.getItem(key) || '0', 10) || 0; } catch {}
         if (hidden.value) { count += 1; try { localStorage.setItem(key, String(count)); } catch {} }
         const dataUrl = await fileToDataUrl(f);
@@ -114,7 +114,7 @@ export function FormStep6() {
       const ctx = canvas.getContext('2d'); ctx.drawImage(video, 0, 0, cw, ch);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
       // Contador de reintentos por lado usando localStorage
-      const key = `painita_id_retake_count_${clsKey}`;
+      const key = `lukeros_id_retake_count_${clsKey}`;
       let count = 0;
       try { count = parseInt(localStorage.getItem(key) || '0', 10) || 0; } catch {}
       if (hidden.value) { // ya existía foto, esto es un reintento
@@ -139,7 +139,7 @@ export function FormStep6() {
       file.style.display = hasPhoto ? 'none' : '';
       cameraBtn.style.display = hasPhoto ? 'none' : '';
       // Respetar límite de reintentos para cámara
-      let count = 0; try { count = parseInt(localStorage.getItem(`painita_id_retake_count_${clsKey}`) || '0', 10) || 0; } catch {}
+      let count = 0; try { count = parseInt(localStorage.getItem(`lukeros_id_retake_count_${clsKey}`) || '0', 10) || 0; } catch {}
       const limit = count >= 3;
       cameraBtn.disabled = limit;
       retakeLink.disabled = limit;
@@ -157,9 +157,9 @@ export function FormStep6() {
   );
   // Listen for a global event to reset retake counters after a successful save
   try {
-    window.addEventListener('painita:step6:saved', () => {
-      try { localStorage.removeItem('painita_id_retake_count_id_front'); } catch {}
-      try { localStorage.removeItem('painita_id_retake_count_id_back'); } catch {}
+    window.addEventListener('lukeros:step6:saved', () => {
+      try { localStorage.removeItem('lukeros_id_retake_count_id_front'); } catch {}
+      try { localStorage.removeItem('lukeros_id_retake_count_id_back'); } catch {}
     });
   } catch {}
   return wrap;

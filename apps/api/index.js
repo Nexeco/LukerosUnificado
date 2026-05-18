@@ -2,9 +2,9 @@ import 'dotenv/config';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import { calcularValorPrestamo } from '@painita/calc';
-import { CRMClient } from '@painita/crm-client';
-import { createTumipayPayment } from '@painita/tumipay';
+import { calcularValorPrestamo } from '@lukeros/calc';
+import { CRMClient } from '@lukeros/crm-client';
+import { createTumipayPayment } from '@lukeros/tumipay';
 
 const app = express();
 app.use(cors());

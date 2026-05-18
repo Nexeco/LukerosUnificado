@@ -1,5 +1,5 @@
 export function createSyncClient({ base = 'http://localhost:4000', storage = globalThis?.localStorage }) {
-  const key = 'painita_solicitud_id';
+  const key = 'lukeros_solicitud_id';
   function getId() { try { return storage?.getItem(key); } catch { return null; } }
   function setId(id) { try { storage?.setItem(key, String(id)); } catch {}
   }

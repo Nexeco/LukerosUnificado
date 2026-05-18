@@ -13,7 +13,7 @@ export function PageLayout(children, { userPhone = '', showLogout = false } = {}
     // User is logged in - show logout button and phone
     const phoneDisplay = userPhone ? `(${userPhone})` : '';
     top.innerHTML = `
-      <a class="topbar__brand" href="/">Painita</a>
+      <a class="topbar__brand" href="/">Lukeros</a>
       <div class="topbar__user">
         <span class="topbar__phone">${phoneDisplay}</span>
         <button class="topbar__logout" type="button">Cerrar sesión</button>
@@ -28,9 +28,9 @@ export function PageLayout(children, { userPhone = '', showLogout = false } = {}
       
       // Clear all session data
       try {
-        localStorage.removeItem('painita_form_id');
-        localStorage.removeItem('painita_form_step');
-        localStorage.removeItem('painita_login_success');
+        localStorage.removeItem('lukeros_form_id');
+        localStorage.removeItem('lukeros_form_step');
+        localStorage.removeItem('lukeros_login_success');
         sessionStorage.clear();
       } catch (e) {
         console.error('Error clearing storage:', e);
@@ -42,7 +42,7 @@ export function PageLayout(children, { userPhone = '', showLogout = false } = {}
   } else {
     // User is not logged in - show login button
     top.innerHTML = `
-      <a class="topbar__brand" href="/">Painita</a>
+      <a class="topbar__brand" href="/">Lukeros</a>
       <button class="topbar__login" type="button">Iniciar sesión</button>
     `;
     
@@ -64,7 +64,7 @@ export function PageLayout(children, { userPhone = '', showLogout = false } = {}
   // Decorative SVG
   const deco = document.createElement('div');
   deco.className = 'layout-deco';
-  deco.innerHTML = `<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="140" cy="140" r="40" fill="#B00020" fill-opacity="0.08" /><circle cx="100" cy="160" r="20" fill="#B00020" fill-opacity="0.12" /></svg>`;
+  deco.innerHTML = `<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="140" cy="140" r="40" fill="#1E4FB3" fill-opacity="0.08" /><circle cx="100" cy="160" r="20" fill="#1E4FB3" fill-opacity="0.12" /></svg>`;
   root.appendChild(deco);
   // If any child uses center-screen, tighten root to remove bottom padding to prevent tiny scrollbars
   const hasCenter = Array.isArray(children) && children.some(el => el?.classList?.contains?.('center-screen'));

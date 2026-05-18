@@ -1,5 +1,5 @@
 {
-  "name": "@painita/tumipay",
+  "name": "@lukeros/tumipay",
   "version": "0.1.0",
   "type": "module",
   "main": "index.js"

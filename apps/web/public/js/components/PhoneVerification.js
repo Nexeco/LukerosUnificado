@@ -10,7 +10,7 @@ export function PhoneVerification({ onVerified, onLogin }) {
   <div class="login-inline hidden">
     <input class="input login-pass" type="password" placeholder="Tu contraseña" />
     <button class="btn login-btn" type="button">Iniciar sesión</button>
-    <div class="login-error" style="color:#b00020; font-size:0.95rem;"></div>
+    <div class="login-error" style="color:var(--primary, #1E4FB3); font-size:0.95rem;"></div>
   </div>
     </div>
     <div class="hint"></div>

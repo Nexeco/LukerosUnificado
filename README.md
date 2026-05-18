@@ -1,4 +1,4 @@
-Painita Unificado (POC)
+Lukeros Unificado (POC)
 
 Contenido
 - apps/crm: mini CRM (JSON storage) con endpoints y UI admin.
@@ -34,8 +34,8 @@ Cómo correr
 Usar tus vistas originales como página principal (LEGACY)
 - Configura la carpeta base al proyecto existente y arranca el server web:
    - PowerShell:
-      - $env:LEGACY_WEB_DIR='C:\\Users\\joanh\\OneDrive\\Documentos\\GitHub\\Painita-Web'
-      - $env:LEGACY_INJECT_ADAPTER='1'   # opcional: inyecta window.PainitaFormSync
+      - $env:LEGACY_WEB_DIR='C:\\Users\\joanh\\OneDrive\\Documentos\\GitHub\\Lukeros-Web'
+      - $env:LEGACY_INJECT_ADAPTER='1'   # opcional: inyecta window.LukerosFormSync
       - node .\\apps\\web\\server.js
 - El servidor autodetecta index.html en subcarpetas comunes (dist, build, client/dist, client/build, public).
 - La UI legacy quedará en http://localhost:4000 y seguirá disponible /start, /sync/:id/step, /status/:id, /payment-link/:id.
@@ -47,5 +47,5 @@ Prueba rápida E2E
 
 Notas
 - Tumipay: si no configuras TUMIPAY_BASE, se usará un link mock local; si configuras TUMIPAY_BASE pero la API falla, verás error de generación de link.
-- El CRM usa JSON; migrar a DB real cuando se integre con Painita-CRM.
+- El CRM usa JSON; migrar a DB real cuando se integre con Lukeros-CRM.
 - Seguridad/autenticación no incluida en este POC.

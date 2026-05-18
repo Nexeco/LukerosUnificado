@@ -67,7 +67,7 @@ export async function createTumipayPayment({ id, amount, installment, apiKey, ap
     amount: Number(amount || 0),
     currency: 'COP',
     payment_method: paymentMethod || process.env.TUMIPAY_PAYMENT_METHOD || 'ALL_METHODS',
-    description: 'Pago préstamo Painita',
+    description: 'Pago préstamo Lukeros',
     redirect_url: returnUrl,
     ipn_url: notifyUrl,
     customer_data: customer ? ({
@@ -98,9 +98,9 @@ export async function createTumipayPayment({ id, amount, installment, apiKey, ap
   }
   // Generic payment links (Bearer or X-Api-Key)
   if (token || (user && pass)) {
-    attempts.push({ url: joinUrl(base, '/payment-links'), body: { reference: String(id), amount: Number(amount || 0), currency: 'COP', description: 'Pago préstamo Painita', metadata: { installment: Number(installment || 0) || undefined } } });
-    attempts.push({ url: joinUrl(base, '/transactions/payment-link'), body: { reference: String(id), amount: Number(amount || 0), currency: 'COP', description: 'Pago préstamo Painita', channel: 'LINK' } });
-    attempts.push({ url: joinUrl(base, '/create-payment-link'), body: { reference: String(id), amount: Number(amount || 0), currency: 'COP', description: 'Pago préstamo Painita' } });
+    attempts.push({ url: joinUrl(base, '/payment-links'), body: { reference: String(id), amount: Number(amount || 0), currency: 'COP', description: 'Pago préstamo Lukeros', metadata: { installment: Number(installment || 0) || undefined } } });
+    attempts.push({ url: joinUrl(base, '/transactions/payment-link'), body: { reference: String(id), amount: Number(amount || 0), currency: 'COP', description: 'Pago préstamo Lukeros', channel: 'LINK' } });
+    attempts.push({ url: joinUrl(base, '/create-payment-link'), body: { reference: String(id), amount: Number(amount || 0), currency: 'COP', description: 'Pago préstamo Lukeros' } });
   }
 
   const details = [];

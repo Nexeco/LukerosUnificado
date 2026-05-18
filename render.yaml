@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: painita-web
+    name: lukeros-web
     env: node
     plan: free
     rootDir: apps/web
@@ -13,7 +13,7 @@ services:
     - key: CRM_HOSTPORT
         fromService:
           type: web
-          name: painita-crm
+          name: lukeros-crm
       property: hostport
       - key: OTP_BYPASS
         value: "1" # remove in production
@@ -23,7 +23,7 @@ services:
         value: "+57"
 
   - type: web
-    name: painita-crm
+    name: lukeros-crm
     env: node
     plan: free
     rootDir: apps/crm
@@ -37,11 +37,11 @@ services:
         generateValue: true
       - key: DATABASE_URL
         fromDatabase:
-          name: painita-db
+          name: lukeros-db
           property: connectionString
 
   - type: web
-    name: painita-api
+    name: lukeros-api
     env: node
     plan: free
     rootDir: apps/api
@@ -54,9 +54,9 @@ services:
     - key: CRM_HOSTPORT
         fromService:
           type: web
-          name: painita-crm
+          name: lukeros-crm
       property: hostport
 
 databases:
-  - name: painita-db
+  - name: lukeros-db
     plan: free

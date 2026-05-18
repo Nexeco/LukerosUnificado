@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { calcularValorPrestamo } from '@painita/calc';
+import { calcularValorPrestamo } from '@lukeros/calc';
 import { init, createSolicitud, updateStep, listSolicitudes, setDecision, getSolicitud as getSol, isPgEnabled, startFormularioForPhone, updateFormularioStep, getFormulario, phoneExists, getCounts, recentClientes, recentFormularios, loginCliente, loginAdmin, listUsuarios, createClient, updateClient, deleteClient, createUser, updateUser, deleteUser, createFormularioAdmin, updateFormularioAdmin, deleteFormularioAdmin, downloadAllClientes, downloadAllFormularios, getHistorialCreditos, getHistorialPorCliente, actualizarEstadoPrestamo } from './db.js';
 import crypto from 'crypto';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

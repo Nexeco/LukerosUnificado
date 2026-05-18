@@ -34,7 +34,7 @@ export function FormStep7() {
     const canvas = document.createElement('canvas'); canvas.width = cw; canvas.height = ch;
     const ctx = canvas.getContext('2d'); ctx.drawImage(video, 0, 0, cw, ch);
     const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-    const key = 'painita_selfie_retake_count';
+    const key = 'lukeros_selfie_retake_count';
     let count = 0; try { count = parseInt(localStorage.getItem(key) || '0', 10) || 0; } catch {}
     if (hidden.value) { count += 1; try { localStorage.setItem(key, String(count)); } catch {} }
     hidden.value = dataUrl; preview.src = dataUrl; preview.style.display='';
@@ -42,7 +42,7 @@ export function FormStep7() {
     if (count >= 3) {
       cameraBtn.disabled = true;
       // Notificar al shell para auto-guardar y redirigir
-      const ev = new CustomEvent('painita:selfie:autoSubmit', { detail: { count, value: dataUrl } });
+      const ev = new CustomEvent('lukeros:selfie:autoSubmit', { detail: { count, value: dataUrl } });
       window.dispatchEvent(ev);
     }
   });

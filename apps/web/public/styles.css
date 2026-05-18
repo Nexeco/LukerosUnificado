@@ -1,4 +1,4 @@
-:root { --primary:#B00020; --white:#fff; --black:#000; --topbar-h: 64px; }
+:root { --primary:#1E4FB3; --accent:#F6C945; --white:#fff; --black:#000; --topbar-h: 64px; }
 * { box-sizing: border-box; }
 body { margin:0; color:var(--black); background:var(--white); font-family: 'Nunito', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans"; }
 .layout-root { min-height:100vh; background:var(--white); position:relative; padding-bottom:40px; overflow-x:hidden; }
@@ -27,14 +27,14 @@ body { margin:0; color:var(--black); background:var(--white); font-family: 'Nuni
 	.container-row.paired > .calc-card { border-top-right-radius:0; border-bottom-right-radius:0; border-right:none; }
 	.container-row.paired > .breakdown-card { border-top-left-radius:0; border-bottom-left-radius:0; }
 }
-.card { background:var(--white); border-radius:12px; border:1px solid rgba(0,0,0,0.08); padding:16px; box-shadow:0 8px 32px rgba(176,0,32,0.08); flex:1 1 320px; }
+.card { background:var(--white); border-radius:12px; border:1px solid rgba(0,0,0,0.08); padding:16px; box-shadow:0 8px 32px rgba(30,79,179,0.08); flex:1 1 320px; }
 .card-center { display:flex; flex-direction:column; max-width:480px; align-items:center; text-align:center; gap:24px; }
 .card-center .card__title { margin: 0; font-size: 1.75rem; line-height: 1.2; }
 .card-center .input { max-width:360px; }
 .card-center .btn { min-width:200px; }
 .card-center .hint, .card-center .error { text-align:center; }
 .card-center .hint { color:#666; font-size:0.95rem; min-height:1.2em; }
-.card-center .error { color:#B00020; min-height:1.2em; }
+.card-center .error { color:var(--primary); min-height:1.2em; }
 /* Nuevo panel OTP */
 .phone-card .pv-otp { width:100%; display:flex; flex-direction:column; align-items:center; gap: 36px; }
 .phone-card .pv-otp.hidden { display:none; }
@@ -70,20 +70,20 @@ body { margin:0; color:var(--black); background:var(--white); font-family: 'Nuni
 .testi__inner h3 { font-size:1.75rem; margin:0 0 28px 0; }
 .btn-primary { background:var(--primary); color:#fff; }
 .slider { width:100%; }
-/* Sliders con rojo Painita consistente (sin aclarar al deslizar) */
+/* Sliders con azul Lukeros consistente (sin aclarar al deslizar) */
 input[type="range"] { -webkit-appearance:none; appearance:none; width:100%; height:6px; background:transparent; --fill: 0%; }
 /* WebKit track con fill controlado por --fill */
 input[type="range"]::-webkit-slider-runnable-track {
 	height:6px;
 	border-radius:4px;
-	background: linear-gradient(to right, var(--primary) 0 var(--fill), rgba(176,0,32,0.25) var(--fill) 100%);
+  background: linear-gradient(to right, var(--primary) 0 var(--fill), rgba(30,79,179,0.25) var(--fill) 100%);
 }
 input[type="range"]::-webkit-slider-thumb {
 	-webkit-appearance:none; appearance:none; width:18px; height:18px; background: var(--primary);
 	border-radius:50%; margin-top:-6px; border:2px solid var(--white); box-shadow:0 1px 2px rgba(0,0,0,0.2);
 }
-/* Firefox: progreso en rojo y pista tenue */
-input[type="range"]::-moz-range-track { height:6px; background: rgba(176,0,32,0.25); border-radius:4px; }
+/* Firefox: progreso en azul y pista tenue */
+input[type="range"]::-moz-range-track { height:6px; background: rgba(30,79,179,0.25); border-radius:4px; }
 input[type="range"]::-moz-range-progress { height:6px; background: var(--primary); border-radius:4px; }
 input[type="range"]::-moz-range-thumb { width:18px; height:18px; background: var(--primary); border:2px solid var(--white); border-radius:50%; box-shadow:0 1px 2px rgba(0,0,0,0.2); }
 .field { display:block; width:100%; margin:8px 0; }
@@ -125,7 +125,7 @@ a { color: var(--primary); }
 	-ms-hyphens: auto;
 }
 
-/* Footer rojo Painita */
+/* Footer azul Lukeros */
 .footer-section { width:100%; padding:16px; position:relative; color:#fff; }
 .footer-section::before {
 	content:""; position:absolute; top:0; bottom:0; left: calc(50% - 50vw); width:100vw; background:var(--primary); z-index:-1;
@@ -164,7 +164,7 @@ a { color: var(--primary); }
 /* Progress bar */
 .progress { width:100%; max-width:420px; display:flex; flex-direction:column; gap:12px; align-items:center; }
 .progress__text { font-weight:700; color: var(--primary); }
-.progress__bar { height:6px; width:100%; background:rgba(176,0,32,0.25); border-radius:4px; position:relative; overflow:hidden; }
+.progress__bar { height:6px; width:100%; background:rgba(30,79,179,0.25); border-radius:4px; position:relative; overflow:hidden; }
 .progress__bar::before { content:""; position:absolute; left:0; top:0; bottom:0; width:inherit; background:var(--primary); }
 
 /* Form layout */
@@ -187,7 +187,7 @@ a { color: var(--primary); }
 	.form-group > :not(.form-label) { flex: 1 1 auto; }
 }
 
-/* Checklists y controles en rojo */
+/* Checklists y controles en azul */
 input[type="checkbox"], input[type="radio"] { accent-color: var(--primary); }
 ul, ol { --marker-color: var(--primary); }
 ul li::marker, ol li::marker { color: var(--marker-color); }
@@ -198,7 +198,7 @@ ul li::marker, ol li::marker { color: var(--marker-color); }
   border: 1px solid rgba(0,0,0,0.08);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 8px 32px rgba(176,0,32,0.08);
+  box-shadow: 0 8px 32px rgba(30,79,179,0.08);
   max-width: 600px;
   width: 100%;
 }
@@ -215,7 +215,7 @@ ul li::marker, ol li::marker { color: var(--marker-color); }
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--primary), #d32f2f);
+  background: linear-gradient(135deg, var(--primary), var(--accent));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -254,10 +254,10 @@ ul li::marker, ol li::marker { color: var(--marker-color); }
   margin-bottom: 20px;
 }
 
-.status-badge--success { background: #e8f5e8; color: #2e7d32; }
-.status-badge--warning { background: #fff3e0; color: #f57c00; }
-.status-badge--info { background: #e3f2fd; color: #1976d2; }
-.status-badge--error { background: #ffebee; color: #d32f2f; }
+.status-badge--success { background: #e8f0ff; color: #1E4FB3; }
+.status-badge--warning { background: #fff5d6; color: #8A6400; }
+.status-badge--info { background: #e8f0ff; color: #1E4FB3; }
+.status-badge--error { background: #fff2bf; color: #8A6400; }
 
 .status-details {
   display: flex;
@@ -335,8 +335,9 @@ ul li::marker, ol li::marker { color: var(--marker-color); }
   transition: all 0.2s ease;
 }
 
+
 .btn--primary:hover {
-  background: #900020;
+  background: #173B86;
   transform: translateY(-1px);
 }
 

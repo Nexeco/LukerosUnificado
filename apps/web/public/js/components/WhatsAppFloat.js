@@ -1,7 +1,7 @@
 export function WhatsAppFloat() {
   const button = document.createElement('a');
   button.className = 'whatsapp-float';
-  button.href = 'https://wa.me/573108586620?text=Hola,%20necesito%20ayuda%20con%20mi%20solicitud%20de%20crédito%20en%20Painita';
+  button.href = 'https://wa.me/573108586620?text=Hola,%20necesito%20ayuda%20con%20mi%20solicitud%20de%20crédito%20en%20Lukeros';
   button.target = '_blank';
   button.rel = 'noopener';
   button.title = 'Contactar por WhatsApp';
