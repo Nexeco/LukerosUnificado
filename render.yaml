@@ -4,17 +4,17 @@ services:
     env: node
     plan: free
     rootDir: apps/web
-    buildCommand: npm install --prefix ../.. && npm install && echo "build done"
+    buildCommand: npm install --prefix ../.. && echo "build done"
     startCommand: node server.js
     healthCheckPath: /
     envVars:
       - key: NODE_VERSION
         value: 18
-    - key: CRM_HOSTPORT
+      - key: CRM_HOSTPORT
         fromService:
           type: web
           name: lukeros-crm
-      property: hostport
+          property: hostport
       - key: OTP_BYPASS
         value: "1" # remove in production
       - key: DEV_OTP_CODE
@@ -27,7 +27,7 @@ services:
     env: node
     plan: free
     rootDir: apps/crm
-    buildCommand: npm install --prefix ../.. && npm install && echo "build done"
+    buildCommand: npm install --prefix ../.. && echo "build done"
     startCommand: node index.js
     healthCheckPath: /health
     envVars:
@@ -45,17 +45,17 @@ services:
     env: node
     plan: free
     rootDir: apps/api
-    buildCommand: npm install --prefix ../.. && npm install && echo "build done"
+    buildCommand: npm install --prefix ../.. && echo "build done"
     startCommand: node index.js
     healthCheckPath: /
     envVars:
       - key: NODE_VERSION
         value: 18
-    - key: CRM_HOSTPORT
+      - key: CRM_HOSTPORT
         fromService:
           type: web
           name: lukeros-crm
-      property: hostport
+          property: hostport
 
 databases:
   - name: lukeros-db
